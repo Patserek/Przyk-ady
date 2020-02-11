@@ -1,0 +1,115 @@
+@Dao
+interface PomiarDao {
+
+    @Insert
+    suspend fun addPomiar(pomiar: Pomiar)
+
+    @Query("SELECT * FROM pomiar ORDER BY id DESC")
+    suspend fun getAllPomiar():List<Pomiar>
+
+    @Insert
+    suspend fun addMultiplePomiar(vararg pomiar: Pomiar)
+
+    @Update
+    suspend fun  updatePomiar(pomiar: Pomiar)
+
+    @Delete
+    suspend fun deletePomiar(pomiar: Pomiar )
+
+    @Query("SELECT avg(Stezenie) FROM Pomiar ")
+     fun average(): Float
+}
+
+
+
+
+
+
+
+@Database(
+    entities = arrayOf(Pomiar::class),
+    version = 1
+)
+abstract class Database:RoomDatabase(){
+    abstract fun getPomiarDao():PomiarDao
+
+    companion object{
+        @Volatile private var instance:com.example.mwproto1.ROOM.Database?=null
+        private val LOCK = Any()
+
+        operator fun invoke(context: Context)= instance?: synchronized(LOCK){
+            instance ?: buildDatabase(context).also{ it ->
+                instance = it
+            }
+        }
+        fun buildDatabase(context: Context) = Room.databaseBuilder(
+            context.applicationContext,
+            com.example.mwproto1.ROOM.Database::class.java,
+            "pomiardatabase"
+        ).build()
+
+    }
+
+
+}
+
+
+
+
+@Entity
+data class X(
+    @ColumnInfo(name="X")
+    val Stezenie: String?,
+    @ColumnInfo(name="X")
+    val Data: String?,
+    @ColumnInfo(name="X")
+    val Zegar: String?,
+    @ColumnInfo(name="X")
+    val Posilek: String?,
+    @ColumnInfo(name="X")
+    val Samopoczucie: String?,
+    @ColumnInfo(name="Stres")
+    val Stres: String?,
+    @ColumnInfo(name="X")
+    val Hiperglikemia: String?
+
+): Parcelable{
+    @PrimaryKey(autoGenerate = true)
+    var id :Int = 0
+
+    constructor(parcel: Parcel) : this(
+        parcel.readString(),
+        parcel.readString(),
+        parcel.readString(),
+        parcel.readString(),
+        parcel.readString(),
+        parcel.readString(),
+        parcel.readString()
+    ) {
+        id = parcel.readInt()
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeString(X)
+        parcel.writeString(X)
+        parcel.writeString(X)
+        parcel.writeString(X)
+        parcel.writeString(X)
+        parcel.writeString(X)
+        parcel.writeString(X)
+        parcel.writeInt(X)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<Pomiar> {
+        override fun createFromParcel(parcel: Parcel): Pomiar {
+            return Pomiar(parcel)
+        }
+
+        override fun newArray(size: Int): Array<Pomiar?> {
+            return arrayOfNulls(size)
+        }
+    }
